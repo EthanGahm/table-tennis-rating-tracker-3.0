@@ -43,10 +43,13 @@ app.post("/players", async (req, res) => {
       dateOfBirth,
       wins = 0,
       gamesPlayed = 0,
+      ranking,
+      gradYear,
+      handednessId,
     } = req.body;
     const newPlayer = await pool.query(
       "INSERT INTO players (firstName, lastName, rating, active, dateOfBirth) VALUES ($1, $2, $3, $4) RETURNING *",
-      [name, rating, games_played, ranking]
+      []
     );
     res.json(newPlayer.rows);
   } catch (error) {
