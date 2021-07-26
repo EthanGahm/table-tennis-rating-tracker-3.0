@@ -38,7 +38,7 @@ async function createPlayer(req, res) {
 
     // Run insert query
     const newPlayer = await pool.query(
-      'INSERT INTO players ("firstName", "lastName", "rating", "active", "dateOfBirth", "wins", "gamesPlayed", "ranking", "gradYear", "handednessId") VALUES ($1, $2, $3, true, null, 0, 0, null, null, null) RETURNING *',
+      'INSERT INTO players ("firstName", "lastName", "rating", "active", "dateOfBirth", "wins", "gamesPlayed", "ranking", "gradYear", "handedness") VALUES ($1, $2, $3, true, null, 0, 0, null, null, null) RETURNING *',
       [firstName, lastName, rating]
     );
 
@@ -73,7 +73,7 @@ async function updatePlayer(req, res) {
     let query = `UPDATE players SET ${fields} WHERE "playerId" = ${id}`;
 
     // Update the player in the database.
-    const updatePlayer = await pool.query(query);
+    await pool.query(query);
 
     // Tell the requester that the update was successful.
     res.json("Player info updated!");
@@ -90,9 +90,7 @@ async function deletePlayer(req, res) {
     const { id } = req.params;
 
     // Delete the player from the players table.
-    const deletePlayer = await pool.query(
-      `DELETE FROM players WHERE "playerId" = ${id}`
-    );
+    await pool.query(`DELETE FROM players WHERE "playerId" = ${id}`);
 
     // Tell the requester that the deletion was successful.
     res.json("Player deleted!");
