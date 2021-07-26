@@ -1,65 +1,30 @@
 const express = require("express");
 const app = express();
 const pool = require("./db");
+const playersController = require("./playersController");
 
 app.use(express.json()); // => req.body
 
-// ROUTES //
+////////////////////
+// PLAYERS ROUTES //
+////////////////////
 
-// get all players
-app.get("/players", async (req, res) => {
-  try {
-    const allPlayers = await pool.query("SELECT * FROM players");
-    res.json(allPlayers.rows);
-  } catch (error) {
-    console.error(error.message);
-  }
-});
+// Query players based on set of filters
+app.get("/players", playersController.getPlayers);
 
-// get a single player
+// Create a player by specifying a name and initial rating.
+app.post("/players", playersController.createPlayer);
 
-app.get("/players/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const player = await pool.query(
-      "SELECT * FROM players WHERE player_id = $1",
-      [id]
-    );
-    res.json(player.rows);
-  } catch (error) {
-    console.error(error.message);
-  }
-});
+// Update a player with a specified set of fields
+// Single route parameter to specify which player should be updated
+app.put("/players/:id", playersController.updatePlayer);
 
-// create a player
+// Delete a player
+app.delete("/players/:id", playersController.deletePlayer);
 
-app.post("/players", async (req, res) => {
-  try {
-    const {
-      firstName,
-      lastName,
-      rating = 100,
-      active = true,
-      dateOfBirth,
-      wins = 0,
-      gamesPlayed = 0,
-      ranking,
-      gradYear,
-      handednessId,
-    } = req.body;
-    const newPlayer = await pool.query(
-      "INSERT INTO players (firstName, lastName, rating, active, dateOfBirth) VALUES ($1, $2, $3, $4) RETURNING *",
-      []
-    );
-    res.json(newPlayer.rows);
-  } catch (error) {
-    console.error(error.message);
-  }
-});
-
-// update a plyaer
-
-// delete a player
+////////////////////
+// MATCHES ROUTES //
+////////////////////
 
 app.listen(5000, () => {
   console.log("server is listening on port 5000");
