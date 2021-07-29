@@ -29,35 +29,37 @@ async function getMatches(req, res) {
   }
 }
 
-async function recordMatch(req, res) {
+async function recordMatches(req, res) {
   try {
-    // All of these values must be specified every time.
-    const { date, winnerId, loserId, bestOf, winnerScore, loserScore } =
-      req.body;
+    // This array will be returned to the requester at the end of the function call to tell them exactly which
+    // matches were inserted into the database and in what order.
+    let matchesInserted = [];
 
-    // Get ratings for winner and loser from the players table.
-    const winnerRatingQuery = await pool.query(
-      `SELECT rating FROM players WHERE "playerId" = ${winnerId}`
-    );
-    const winnerRating = winnerRatingQuery.rows[0].rating;
-    const loserRatingQuery = await pool.query(
-      `SELECT rating FROM players WHERE "playerId" = ${loserId}`
-    );
-    const loserRating = loserRatingQuery.rows[0].rating;
+    // Iterate through each match that's been submitted.
+    for (const match of req.body) {
+      // All of these values must be specified every time.
+      let { date, winnerId, loserId, bestOf, winnerScore, loserScore } = match;
 
-    console.log(winnerRating);
+      // Get ratings for winner and loser from the players table.
+      let winnerRatingQuery = await pool.query(
+        `SELECT rating FROM players WHERE "playerId" = ${winnerId}`
+      );
+      let winnerRating = winnerRatingQuery.rows[0].rating;
+      let loserRatingQuery = await pool.query(
+        `SELECT rating FROM players WHERE "playerId" = ${loserId}`
+      );
+      let loserRating = loserRatingQuery.rows[0].rating;
 
-    // Find rating adjustment values.
-    const [winnerRatingChange, loserRatingChange] = calcRatingChanges(
-      winnerRating,
-      loserRating,
-      winnerScore,
-      loserScore
-    );
-    console.log(typeof date);
+      // Find rating adjustment values.
+      let [winnerRatingChange, loserRatingChange] = calcRatingChanges(
+        winnerRating,
+        loserRating,
+        winnerScore,
+        loserScore
+      );
 
-    // Insert new match row into matches table.
-    const insertQueryString = `INSERT INTO matches (
+      // Insert new match row into matches table.
+      let insertQueryString = `INSERT INTO matches (
       "date", 
       "winnerId", 
       "loserId", 
@@ -70,7 +72,7 @@ async function recordMatch(req, res) {
       "loserRatingChange"
     ) 
     VALUES (
-      to_timestamp(${date.toString()}, 'YYYY-MM-DD'),
+      to_date('${date}', 'YYYY-MM-DD'),
       ${winnerId},
       ${loserId},
       ${winnerRating},
@@ -78,27 +80,31 @@ async function recordMatch(req, res) {
       ${bestOf},
       ${winnerScore},
       ${loserScore},
-      ${winnerRatingChange},
-      ${loserRatingChange}
+      ${parseFloat(winnerRatingChange)},
+      ${parseFloat(loserRatingChange)}
     ) RETURNING *`;
-    const newMatch = await pool.query(insertQueryString);
+      let newMatch = await pool.query(insertQueryString);
 
-    // Apply rating adjustment values and update players table accordingly.
-    const newWinnerRating = winnerRating + winnerRatingChange;
-    const newLoserRating = loserRating + loserRatingChange;
-    await pool.query(
-      `UPDATE players SET rating = ${newWinnerRating} WHERE "playerId" = ${winnerId}`
-    );
-    await pool.query(
-      `UPDATE players SET rating = ${newLoserRating} WHERE "playerId" = ${loserId}`
-    );
+      // Apply rating adjustment values and update players table accordingly.
+      // Increment the number of games played for each player and increment the number of wins for the winner.
+      let newWinnerRating = parseFloat(winnerRating) + winnerRatingChange;
+      let newLoserRating = parseFloat(loserRating) + loserRatingChange;
+      await pool.query(
+        `UPDATE players SET rating = ${newWinnerRating}, "gamesPlayed" = "gamesPlayed" + 1, wins = wins + 1 WHERE "playerId" = ${winnerId}`
+      );
+      await pool.query(
+        `UPDATE players SET rating = ${newLoserRating}, "gamesPlayed" = "gamesPlayed" + 1 WHERE "playerId" = ${loserId}`
+      );
 
-    // Inform requester that match has been successfully recorded.
-    res.json(newMatch.rows);
+      // Insert the new match into the list of all inserted matches.
+      matchesInserted.push(newMatch.rows);
+    }
+    // Inform requester that matches were sucessfully recorded and give the matches' data as a JSON.
+    res.json(matchesInserted);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: error });
   }
 }
 
-module.exports = { getMatches, recordMatch };
+module.exports = { getMatches, recordMatches };

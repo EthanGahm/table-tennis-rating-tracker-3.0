@@ -5,6 +5,10 @@ const matchesResolvers = require("./matchesResolvers");
 
 app.use(express.json()); // => req.body
 
+app.get("/", (req, res) => {
+  res.json({ Message: "Club Table Tennis at UVA | Rating Tracker API" });
+});
+
 ////////////////////
 // PLAYERS ROUTES //
 ////////////////////
@@ -30,7 +34,7 @@ app.delete("/players/:id", playersResolvers.deletePlayer);
 app.get("/matches", matchesResolvers.getMatches);
 
 // Create a new entry in the matches table and update player ratings accordingly.
-app.post("/matches", matchesResolvers.recordMatch);
+app.post("/matches", matchesResolvers.recordMatches);
 
 app.listen(5000, () => {
   console.log("server is listening on port 5000");
