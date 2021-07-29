@@ -1,7 +1,7 @@
 const pool = require("./db");
 const { calcRatingChanges } = require("./eloCalc");
 
-// Returns a list of rows from the players table based on a set of filters
+// Returns a list of rows from the matches table based on a set of filters
 async function getMatches(req, res) {
   try {
     // Base for query
@@ -29,6 +29,8 @@ async function getMatches(req, res) {
   }
 }
 
+// Adds one or more matches to the matches table based on an array of JSON objects passed in the body
+// of the http request.
 async function recordMatches(req, res) {
   try {
     // This array will be returned to the requester at the end of the function call to tell them exactly which
@@ -107,4 +109,92 @@ async function recordMatches(req, res) {
   }
 }
 
-module.exports = { getMatches, recordMatches };
+async function updateMatch(req, res) {
+  try {
+    // Get match ID from route params
+    const { id } = req.params;
+
+    // String stub; will be used to store fields and their values
+    let fields = "";
+
+    // If at least one field has been included in the body of the request,
+    // update those field(s).
+    if (Object.keys(req.body).length > 0) {
+      for (const key of Object.keys(req.body)) {
+        fields += `"${key}" = '${req.body[key]}', `;
+      }
+      // Remove the trailing ", " at the end of the fields string.
+      fields = fields.slice(0, fields.length - 2);
+    }
+
+    // Complete query string
+    let query = `UPDATE matches SET ${fields} WHERE "matchId" = ${id}`;
+
+    // Update the match in the database.
+    await pool.query(query);
+
+    // Tell the requester that the update was successful.
+    res.json("Match info updated!");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error });
+  }
+}
+
+// Deletes a match based on a match id specified as a route param.
+async function deleteMatch(req, res) {
+  try {
+    // Get match ID from route params
+    const { id } = req.params;
+
+    // Delete the match from the matches table.
+    await pool.query(`DELETE FROM matches WHERE "matchId" = ${id}`);
+
+    // Tell the requester that the deletion was successful.
+    res.json("Match deleted!");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error });
+  }
+}
+
+// Deletes a match and reverts player ratings back to what they were before that match was played.
+async function unrecordMatch(req, res) {
+  try {
+    // Get match id from request params.
+    const { id } = req.params;
+
+    // Grab the winner and loser ratings from before the match.
+    const matchDataQuery = await pool.query(
+      `SELECT "winnerId", "loserId", "winnerRating", "loserRating" FROM matches WHERE "matchId" = ${id}`
+    );
+    const { winnerId, loserId, winnerRating, loserRating } =
+      matchDataQuery.rows[0];
+
+    // Revert the players to their pre-match ratings and update the "gamesPlayed" and "wins" values accordingly.
+    await pool.query(
+      `UPDATE players SET rating = ${winnerRating}, "gamesPlayed" = "gamesPlayed" - 1, wins = wins - 1 WHERE "playerId" = ${winnerId}`
+    );
+
+    await pool.query(
+      `UPDATE players SET rating = ${loserRating}, "gamesPlayed" = "gamesPlayed" - 1 WHERE "playerId" = ${loserId}`
+    );
+
+    // Delete the match from the matches table.
+    await pool.query(`DELETE FROM matches WHERE "matchId" = ${id}`);
+
+    // Inform requester that match was sucessfully removed.
+    res.json("Match unrecorded successfully!");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error });
+  }
+}
+
+module.exports = {
+  getMatches,
+  recordMatches,
+  updateMatch,
+  deleteMatch,
+  unrecordMatch,
+};

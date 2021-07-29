@@ -36,6 +36,17 @@ app.get("/matches", matchesResolvers.getMatches);
 // Create a new entry in the matches table and update player ratings accordingly.
 app.post("/matches", matchesResolvers.recordMatches);
 
+// Update a match with a specified set of fields
+// Single route parameter to specify which player should be updated
+app.put("/matches/:id", matchesResolvers.updateMatch);
+
+// Delete a match. Generally don't use this endpoint since it doesn't do anything about rating adjustments, etc.
+// app.delete("/matches/:id", matchesResolvers.deleteMatch);
+
+// Unrecord a match. Should only be used to remove a game if it's the most recent game for both players.
+// Makes it as if that match was never played by reverting player ratings to what they were before the game.
+app.delete("/matches/:id", matchesResolvers.unrecordMatch);
+
 app.listen(5000, () => {
   console.log("server is listening on port 5000");
 });
