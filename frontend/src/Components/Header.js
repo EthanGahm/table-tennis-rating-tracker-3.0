@@ -14,16 +14,26 @@ import { AccountCircle, Menu as MenuIcon } from "@material-ui/icons";
 
 export default function Header({ pageTitle }) {
   const classes = useStyles();
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const open = Boolean(anchorEl);
+  const [userMenuAnchor, setUserMenuAnchor] = React.useState(null);
+  const userMenuOpen = Boolean(userMenuAnchor);
+  const [pageMenuAnchor, setPageMenuAnchor] = React.useState(null);
+  const pageMenuOpen = Boolean(pageMenuAnchor);
   const [loggedIn, setLoggedIn] = React.useState(false);
 
-  const handleMenu = (event) => {
-    setAnchorEl(event.currentTarget);
+  const openUserMenu = (event) => {
+    setUserMenuAnchor(event.currentTarget);
   };
 
-  const handleClose = () => {
-    setAnchorEl(null);
+  const closeUserMenu = () => {
+    setUserMenuAnchor(null);
+  };
+
+  const openPageMenu = (event) => {
+    setPageMenuAnchor(event.currentTarget);
+  };
+
+  const closePageMenu = () => {
+    setPageMenuAnchor(null);
   };
 
   const handleLogin = () => {
@@ -31,6 +41,7 @@ export default function Header({ pageTitle }) {
   };
 
   const handleLogOut = () => {
+    closeUserMenu();
     setLoggedIn(false);
   };
 
@@ -42,10 +53,30 @@ export default function Header({ pageTitle }) {
             edge="start"
             className={classes.menuButton}
             color="inherit"
+            onClick={openPageMenu}
             aria-label="menu"
           >
             <MenuIcon />
           </IconButton>
+          <Menu
+            id="menu-appbar"
+            anchorEl={pageMenuAnchor}
+            anchorOrigin={{
+              vertical: "top",
+              horizontal: "right",
+            }}
+            keepMounted
+            transformOrigin={{
+              vertical: "top",
+              horizontal: "right",
+            }}
+            open={pageMenuOpen}
+            onClose={closePageMenu}
+          >
+            <MenuItem onClick={closePageMenu}>Home</MenuItem>
+            <MenuItem onClick={closePageMenu}>Ranking</MenuItem>
+            <MenuItem onClick={closePageMenu}>Record Matches</MenuItem>
+          </Menu>
           <Typography variant="h6" className={classes.title}>
             {pageTitle}
           </Typography>
@@ -55,14 +86,14 @@ export default function Header({ pageTitle }) {
                 aria-label="account of current user"
                 aria-controls="menu-appbar"
                 aria-haspopup="true"
-                onClick={handleMenu}
+                onClick={openUserMenu}
                 color="inherit"
               >
                 <AccountCircle />
               </IconButton>
               <Menu
                 id="menu-appbar"
-                anchorEl={anchorEl}
+                anchorEl={userMenuAnchor}
                 anchorOrigin={{
                   vertical: "top",
                   horizontal: "right",
@@ -72,11 +103,11 @@ export default function Header({ pageTitle }) {
                   vertical: "top",
                   horizontal: "right",
                 }}
-                open={open}
-                onClose={handleClose}
+                open={userMenuOpen}
+                onClose={closeUserMenu}
               >
-                <MenuItem onClick={handleClose}>Profile</MenuItem>
-                <MenuItem onClick={handleClose}>My account</MenuItem>
+                <MenuItem onClick={closeUserMenu}>Profile</MenuItem>
+                <MenuItem onClick={closeUserMenu}>My account</MenuItem>
                 <MenuItem onClick={handleLogOut}>Log out</MenuItem>
               </Menu>
             </div>
