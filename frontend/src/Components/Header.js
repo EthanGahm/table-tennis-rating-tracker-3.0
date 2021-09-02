@@ -8,6 +8,7 @@ import {
   MenuItem,
   Menu,
   Button,
+  Link,
 } from "@material-ui/core";
 
 import { AccountCircle, Menu as MenuIcon } from "@material-ui/icons";
@@ -73,9 +74,15 @@ export default function Header({ pageTitle }) {
             open={pageMenuOpen}
             onClose={closePageMenu}
           >
-            <MenuItem onClick={closePageMenu}>Home</MenuItem>
-            <MenuItem onClick={closePageMenu}>Ranking</MenuItem>
-            <MenuItem onClick={closePageMenu}>Record Matches</MenuItem>
+            <Link href="/">
+              <MenuItem onClick={closePageMenu}>Home</MenuItem>
+            </Link>
+            <Link href="/rankings">
+              <MenuItem onClick={closePageMenu}>Rankings</MenuItem>
+            </Link>
+            <Link href="/record-results">
+              <MenuItem onClick={closePageMenu}>Record a Result</MenuItem>
+            </Link>
           </Menu>
           <Typography variant="h6" className={classes.title}>
             {pageTitle}

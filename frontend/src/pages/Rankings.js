@@ -2,13 +2,13 @@ import React from "react";
 import Header from "../Components/Header";
 import { Typography } from "@material-ui/core";
 
-const Home = () => {
+const Rankings = () => {
   return (
     <div>
-      <Header pageTitle={"Home"} />
-      <Typography>Home Page</Typography>
+      <Header pageTitle={"Rankings"} />
+      <Typography>Rankings page</Typography>
     </div>
   );
 };
 
-export default Home;
+export default Rankings;
