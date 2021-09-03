@@ -8,7 +8,6 @@ async function getPlayers(req, res) {
 
     // Check for "orderBy" parameter
     let orderBy = false;
-    console.log(Object.keys(req.body));
     if (Object.keys(req.body).includes("orderBy")) {
       orderBy = req.body.orderBy;
       delete req.body.orderBy;

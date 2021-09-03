@@ -1,8 +1,10 @@
 const express = require("express");
+const cors = require("cors");
 const app = express();
 const playersResolvers = require("./playersResolvers");
 const matchesResolvers = require("./matchesResolvers");
 
+app.use(cors());
 app.use(express.json()); // => req.body
 
 app.get("/", (req, res) => {

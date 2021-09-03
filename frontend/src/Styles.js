@@ -10,6 +10,10 @@ const useStyles = makeStyles((theme) => ({
   title: {
     flexGrow: 1,
   },
+  table: {
+    minWidth: 650,
+    spacing: 50,
+  },
 }));
 
 export default useStyles;
