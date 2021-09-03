@@ -6,6 +6,21 @@ async function getPlayers(req, res) {
     // Base for query
     let query = "SELECT * FROM players";
 
+    // Check for "orderBy" parameter
+    let orderBy = false;
+    console.log(Object.keys(req.body));
+    if (Object.keys(req.body).includes("orderBy")) {
+      orderBy = req.body.orderBy;
+      delete req.body.orderBy;
+    }
+
+    // Check for "rowLimit" parameter
+    let rowLimit = false;
+    if (Object.keys(req.body).includes("rowLimit")) {
+      rowLimit = req.body.rowLimit;
+      delete req.body.rowLimit;
+    }
+
     // Add on a new WHERE clause for each filter specified
     // If no filters are specified, the base query is made selecting all players.
     if (Object.keys(req.body).length > 0) {
@@ -15,6 +30,16 @@ async function getPlayers(req, res) {
       }
       // Remove the trailing " AND" at the end of the query.
       query = query.slice(0, query.length - 4);
+    }
+
+    // Append ORDER BY clause
+    if (orderBy) {
+      query += " ORDER BY " + orderBy;
+    }
+
+    // Append LIMIT clause
+    if (rowLimit) {
+      query += " LIMIT " + rowLimit;
     }
 
     // Make query
