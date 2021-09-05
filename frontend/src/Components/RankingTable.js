@@ -17,8 +17,8 @@ export default function RankingTable({ data }) {
   return (
     <div>
       {data ? (
-        <Box m={2} component={Paper}>
-          <Table className={classes.table} size="small">
+        <Box className={classes.table} m={3} component={Paper}>
+          <Table size="small">
             <TableHead>
               <TableRow>
                 <TableCell align="center">Rank</TableCell>

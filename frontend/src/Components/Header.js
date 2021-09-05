@@ -55,7 +55,6 @@ export default function Header({ pageTitle }) {
             className={classes.menuButton}
             color="inherit"
             onClick={openPageMenu}
-            aria-label="menu"
           >
             <MenuIcon />
           </IconButton>

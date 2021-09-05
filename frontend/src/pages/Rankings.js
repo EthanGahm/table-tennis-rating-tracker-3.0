@@ -10,7 +10,7 @@ const loadTableData = async () => {
     url: backendURL + "players",
     data: {
       active: true,
-      orderBy: "rating",
+      orderBy: "rating DESC",
     },
   });
   return response.data;

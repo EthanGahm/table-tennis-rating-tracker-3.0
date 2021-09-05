@@ -14,6 +14,9 @@ const useStyles = makeStyles((theme) => ({
     minWidth: 650,
     spacing: 50,
   },
+  tableHeader: {
+    margin: 10,
+  },
 }));
 
 export default useStyles;
