@@ -6,9 +6,7 @@ import Content from '../components/Content';
 export default function Index() {
   return (
     <>
-      <Hero />
-      <hr />
-      <Content />
+      <h3>Welcome to Club Table Tennis at UVA!</h3>
     </>
   );
 }
