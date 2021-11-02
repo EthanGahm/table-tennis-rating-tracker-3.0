@@ -26,7 +26,9 @@ const NavBar = () => {
     <div className="nav-container" data-testid="navbar">
       <Navbar color="light" light expand="md">
         <Container>
-          <NavbarBrand className="logo" />
+          <NavbarBrand>
+            <img width="50px" height="auto" src="favicon.png" />
+          </NavbarBrand>
           <NavbarToggler onClick={toggle} data-testid="navbar-toggle" />
           <Collapse isOpen={isOpen} navbar>
             <Nav className="mr-auto" navbar data-testid="navbar-items">
@@ -35,25 +37,16 @@ const NavBar = () => {
                   Home
                 </PageLink>
               </NavItem>
-              {user && (
-                <>
-                  <NavItem>
-                    <PageLink href="/csr" className="nav-link" testId="navbar-csr">
-                      Client-side rendered page
-                    </PageLink>
-                  </NavItem>
-                  <NavItem>
-                    <PageLink href="/ssr" className="nav-link" testId="navbar-ssr">
-                      Server-side rendered page
-                    </PageLink>
-                  </NavItem>
-                  <NavItem>
-                    <PageLink href="/external" className="nav-link" testId="navbar-external">
-                      External API
-                    </PageLink>
-                  </NavItem>
-                </>
-              )}
+              <NavItem>
+                <PageLink href="/ranking" className="nav-link">
+                  Ranking
+                </PageLink>
+              </NavItem>
+              <NavItem>
+                <PageLink href="/record-match" className="nav-link">
+                  Record a Match
+                </PageLink>
+              </NavItem>
             </Nav>
             <Nav className="d-none d-md-block" navbar>
               {!isLoading && !user && (

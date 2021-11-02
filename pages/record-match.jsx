@@ -2,10 +2,10 @@ import React from 'react';
 
 import Content from '../components/Content';
 
-export default function Index() {
+export default function RecordMatch() {
   return (
     <>
-      <h3>Welcome to Club Table Tennis at UVA!</h3>
+      <h3>Record a match</h3>
     </>
   );
 }
