@@ -5,11 +5,20 @@ export default async function handler(req, res) {
     // Base for query
     let query = 'SELECT * FROM players';
 
+    let keys = Object.keys(req.body);
+
     // Check for "orderBy" parameter
     let orderBy = false;
-    if (Object.keys(req.body).includes('orderBy')) {
+    if (keys.includes('orderBy')) {
       orderBy = req.body.orderBy;
       delete req.body.orderBy;
+    }
+
+    // Check for "desc" parameter
+    let desc = false;
+    if (keys.includes('desc')) {
+      desc = req.body.desc;
+      delete req.body.desc;
     }
 
     // Check for "rowLimit" parameter
@@ -33,6 +42,10 @@ export default async function handler(req, res) {
     // Append ORDER BY clause
     if (orderBy) {
       query += ` ORDER BY "${orderBy}"`;
+
+      if (desc) {
+        query += ' DESC';
+      }
     }
 
     // Append LIMIT clause
@@ -42,6 +55,7 @@ export default async function handler(req, res) {
 
     // Make query
     const players = await pool.query(query);
+    console.log(query);
 
     // Send result of query back to requester.
     res.json(players.rows);
