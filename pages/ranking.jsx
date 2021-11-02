@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { server } from '../config';
 
 import axios from 'axios';
 
@@ -9,15 +10,24 @@ export default function Ranking() {
   const [tableRows, setTableRows] = useState();
 
   useEffect(() => {
-    axios({
-      method: 'get',
-      url: '/api/get-players',
-      data: {
-        active: true,
-        orderBy: 'rating',
-        desc: true
+    const requestBody = {
+      active: true,
+      orderBy: 'rating',
+      desc: true
+    };
+    console.log(requestBody);
+    axios(
+      {
+        method: 'get',
+        url: `${server}/api/get-players`,
+        data: requestBody
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json'
+        }
       }
-    }).then(res => {
+    ).then(res => {
       let rows = [];
       for (const [index, player] of res.data.entries()) {
         rows.push([index + 1, player.firstName + ' ' + player.lastName, player.rating]);

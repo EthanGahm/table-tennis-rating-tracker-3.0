@@ -5,7 +5,8 @@ export default async function handler(req, res) {
     // Base for query
     let query = 'SELECT * FROM players';
 
-    let keys = Object.keys(req.body);
+    console.log(req.body);
+    let keys = Object.keys(req);
 
     // Check for "orderBy" parameter
     let orderBy = false;
@@ -64,3 +65,11 @@ export default async function handler(req, res) {
     res.status(500).json({ error: error });
   }
 }
+
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '1mb'
+    }
+  }
+};
