@@ -10,27 +10,16 @@ export default function Ranking() {
   const [tableRows, setTableRows] = useState();
 
   useEffect(() => {
-    const requestBody = {
-      active: true,
-      orderBy: 'rating',
-      desc: true
-    };
-    console.log(requestBody);
-    axios(
-      {
-        method: 'get',
-        url: `${server}/api/get-players`,
-        data: requestBody
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      }
-    ).then(res => {
+    axios({
+      method: 'get',
+      url: '/api/get-players'
+    }).then(res => {
       let rows = [];
-      for (const [index, player] of res.data.entries()) {
-        rows.push([index + 1, player.firstName + ' ' + player.lastName, player.rating]);
+      let players = res.data;
+      players.sort((a, b) => a.rating > b.rating);
+      let index = 0;
+      for (const player of players) {
+        rows.push([++index, player.firstName + ' ' + player.lastName, Math.round(player.rating, 4)]);
       }
       setTableRows(rows);
     });
